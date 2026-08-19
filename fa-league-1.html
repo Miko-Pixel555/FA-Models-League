@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FA Models — دوري أغسطس 2025</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep: #14311f;
+    --bg-panel: #1b3f28;
+    --bg-card: #21492f;
+    --line: rgba(237, 230, 214, 0.12);
+    --wheat: #d4a24c;
+    --wheat-bright: #e8bd6c;
+    --silver: #b9c2b3;
+    --bronze: #b8794f;
+    --parchment: #ede6d6;
+    --parchment-dim: #c7c2ae;
+    --leaf: #6fa06f;
+    --danger: #c96a4f;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(212,162,76,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(111,160,111,0.10), transparent 55%),
+      var(--bg-deep);
+    color: var(--parchment);
+    font-family: 'Cairo', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+  .field-lines{
+    position: fixed; inset: 0; z-index: 0; pointer-events:none; opacity: 0.06;
+    background-image: repeating-linear-gradient(0deg, var(--parchment) 0 1px, transparent 1px 90px),
+                       repeating-linear-gradient(90deg, var(--parchment) 0 1px, transparent 1px 90px);
+  }
+  header{
+    position: relative; z-index: 1;
+    padding: 40px 20px 24px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--wheat);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.9;
+  }
+  h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(28px, 7vw, 44px);
+    margin: 0 0 6px;
+    letter-spacing: -0.5px;
+    color: var(--parchment);
+  }
+  h1 span{ color: var(--wheat-bright); }
+  .subtitle{
+    color: var(--parchment-dim);
+    font-size: 14px;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+  #month-picker{
+    background: var(--bg-card); border: 1px solid var(--line);
+    color: var(--wheat-bright); padding: 8px 16px; border-radius: 20px;
+    font-family:'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 1px;
+    outline: none; cursor: pointer;
+  }
+  .legend{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:8px 18px;
+    margin-top: 18px; font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--parchment-dim);
+  }
+  .legend b{ color: var(--wheat); font-weight:600; }
+
+  .podium{
+    position: relative; z-index: 1;
+    max-width: 720px; margin: 34px auto 8px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+    padding: 0 16px;
+  }
+  .podium-card{
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 12px 16px;
+    text-align: center;
+    position: relative;
+    animation: rise 0.6s ease backwards;
+  }
+  .podium-card:nth-child(1){ order:2; transform: translateY(-10px); border-color: rgba(212,162,76,0.5); animation-delay: 0.1s;}
+  .podium-card:nth-child(2){ order:1; animation-delay: 0.02s;}
+  .podium-card:nth-child(3){ order:3; animation-delay: 0.18s;}
+  @keyframes rise{ from{opacity:0; transform: translateY(18px);} to{opacity:1; transform: translateY(0);} }
+  .podium-card:nth-child(1){ animation-name: risetop; }
+  @keyframes risetop{ from{opacity:0; transform: translateY(18px);} to{opacity:1; transform: translateY(-10px);} }
+  .medal{ font-family:'IBM Plex Mono', monospace; font-size: 11px; letter-spacing:2px; margin-bottom:8px; }
+  .rank1 .medal{ color: var(--wheat-bright); }
+  .rank2 .medal{ color: var(--silver); }
+  .rank3 .medal{ color: var(--bronze); }
+  .p-name{ font-family:'Fraunces', serif; font-weight:600; font-size: 20px; margin-bottom:4px; }
+  .p-points{ font-family:'IBM Plex Mono', monospace; font-size: 22px; font-weight:600; }
+  .rank1 .p-points{ color: var(--wheat-bright); }
+  .rank2 .p-points{ color: var(--silver); }
+  .rank3 .p-points{ color: var(--bronze); }
+  .p-label{ font-size:10px; color: var(--parchment-dim); margin-top:2px; }
+
+  .controls{
+    position: relative; z-index:1;
+    max-width: 760px; margin: 30px auto 14px; padding: 0 16px;
+    display:flex; gap:10px; align-items:center;
+  }
+  #search{
+    flex:1; background: var(--bg-card); border: 1px solid var(--line);
+    color: var(--parchment); padding: 11px 14px; border-radius: 10px;
+    font-family:'Cairo',sans-serif; font-size:14px; outline:none;
+  }
+  #search::placeholder{ color: var(--parchment-dim); }
+  #search:focus{ border-color: var(--wheat); }
+
+  table.board{
+    position: relative; z-index:1;
+    max-width: 760px; margin: 0 auto; width: calc(100% - 32px);
+    border-collapse: collapse;
+    background: var(--bg-panel);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  thead th{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--parchment-dim); text-align: right; font-weight:500;
+    padding: 12px 14px; border-bottom: 1px solid var(--line);
+  }
+  thead th:first-child, tbody td:first-child{ text-align:center; }
+  tbody tr{ border-bottom: 1px solid var(--line); cursor:pointer; transition: background 0.15s; }
+  tbody tr:last-child{ border-bottom:none; }
+  tbody tr:hover{ background: rgba(212,162,76,0.06); }
+  tbody td{ padding: 12px 14px; font-size: 14px; }
+  .rank-cell{ font-family:'IBM Plex Mono', monospace; color: var(--parchment-dim); font-size: 13px; width: 40px; }
+  .model-name{ font-family:'Fraunces', serif; font-weight:600; font-size: 16px; }
+  .pts-cell{ font-family:'IBM Plex Mono', monospace; font-weight:600; color: var(--wheat-bright); text-align:left; }
+  tr.expand-row td{ padding: 0; }
+  .details{
+    max-height:0; overflow:hidden; transition: max-height 0.25s ease;
+    background: rgba(0,0,0,0.15);
+  }
+  .details.open{ max-height: 200px; }
+  .details-inner{
+    display:grid; grid-template-columns: repeat(4,1fr); gap:8px;
+    padding: 14px 18px 16px; font-family:'IBM Plex Mono', monospace; font-size:11px;
+  }
+  .details-inner div{ text-align:center; }
+  .details-inner b{ display:block; color: var(--wheat); font-size:15px; margin-bottom:2px; }
+  .details-inner span{ color: var(--parchment-dim); }
+
+  /* ===== Side panel (why points) ===== */
+  .panel-overlay{
+    position: fixed; inset: 0; background: rgba(10,20,13,0.55);
+    z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    backdrop-filter: blur(2px);
+  }
+  .panel-overlay.open{ opacity: 1; pointer-events: auto; }
+  .side-panel{
+    position: fixed; top: 0; bottom: 0; left: 0;
+    width: min(400px, 88vw);
+    background: var(--bg-panel);
+    border-right: 1px solid var(--line);
+    z-index: 21;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    padding: 22px 18px 40px;
+  }
+  .side-panel.open{ transform: translateX(0); }
+  .panel-header{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--line);
+  }
+  .panel-title{ font-family:'Fraunces', serif; font-weight:600; font-size: 22px; }
+  .panel-sub{ font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--parchment-dim); margin-top:2px;}
+  .panel-close{
+    background: var(--bg-card); border: 1px solid var(--line); color: var(--parchment);
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .reason-card{
+    background: var(--bg-card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .reason-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px; }
+  .reason-cat{ font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--leaf); letter-spacing: 0.5px; }
+  .reason-pts{ font-family:'IBM Plex Mono', monospace; font-size: 13px; font-weight:600; color: var(--wheat-bright); }
+  .reason-text{ font-size: 13.5px; line-height: 1.7; color: var(--parchment); }
+  .reason-date{ font-family:'IBM Plex Mono', monospace; font-size: 10px; color: var(--parchment-dim); margin-top: 6px; }
+  .panel-empty{ color: var(--parchment-dim); font-size: 13px; text-align:center; padding: 40px 10px; line-height: 1.8; }
+  .panel-loading{ color: var(--parchment-dim); font-size: 13px; text-align:center; padding: 30px 10px; font-family:'IBM Plex Mono', monospace; }
+  .why-btn{
+    font-family:'IBM Plex Mono', monospace; font-size: 10px; color: var(--wheat);
+    background: none; border: 1px solid var(--wheat); border-radius: 20px;
+    padding: 4px 12px; cursor: pointer; margin-top: 4px;
+  }
+  .why-btn:hover{ background: rgba(212,162,76,0.12); }
+
+  footer{
+    text-align:center; color: var(--parchment-dim); font-size:11px;
+    margin-top: 34px; font-family:'IBM Plex Mono', monospace; letter-spacing:0.5px;
+  }
+
+  @media (max-width: 480px){
+    .podium{ grid-template-columns: 1fr 1fr 1fr; gap:8px; }
+    .p-name{ font-size:15px; }
+    .p-points{ font-size:18px; }
+    .details-inner{ grid-template-columns: repeat(2,1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="field-lines"></div>
+
+<header>
+  <div class="eyebrow">FOOD &amp; AGRICULTURE MODEL</div>
+  <h1>ترتيب دوري <span>الموديلات</span></h1>
+  <div class="subtitle">أغسطس 2025 — نقط كل موديل من الفعاليات والحملات والمهام الإضافية طول الشهر</div>
+  <div class="legend">
+    <span>حدث حضوري = <b>7</b></span>
+    <span>كورس = <b>10</b></span>
+    <span>ورشة/جلسة = <b>5</b></span>
+    <span>حملة = <b>3</b></span>
+    <span>مهمة إضافية = <b>3</b></span>
+  </div>
+  <div id="month-picker-wrap" style="margin-top:16px; display:none; display:flex; gap:10px; justify-content:center; align-items:center;">
+    <select id="month-picker"></select>
+    <button id="excel-btn" class="why-btn" style="margin-top:0;">تنزيل Excel</button>
+  </div>
+</header>
+
+<div class="podium" id="podium"></div>
+
+<div class="controls">
+  <input id="search" type="text" placeholder="دور على موديل...">
+</div>
+
+<table class="board">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>الموديل</th>
+      <th style="text-align:left">النقط</th>
+    </tr>
+  </thead>
+  <tbody id="board-body"></tbody>
+</table>
+
+<footer>UPDATED · AUGUST 2025 · TAP A ROW FOR THE BREAKDOWN</footer>
+
+<div class="panel-overlay" id="panel-overlay"></div>
+<div class="side-panel" id="side-panel">
+  <div class="panel-header">
+    <div>
+      <div class="panel-title" id="panel-model-name">—</div>
+      <div class="panel-sub" id="panel-model-sub">ليه أخد كل نقطة</div>
+    </div>
+    <button class="panel-close" id="panel-close">✕</button>
+  </div>
+  <div id="panel-body"></div>
+</div>
+
+<script>
+// لما تاخد لينك الـ Web App من Google Apps Script، حطه هنا بدل null
+const LIVE_DATA_URL = null; // مثال: 'https://script.google.com/macros/s/xxxxx/exec'
+
+const staticData = [
+  {name:"MU", offline:42, online:265, campaign:96, tasks:44, total:447},
+  {name:"CU", offline:14, online:195, campaign:60, tasks:16, total:285},
+  {name:"MAU", offline:90, online:80, campaign:30, tasks:43, total:243},
+  {name:"DMU", offline:14, online:155, campaign:30, tasks:43, total:242},
+  {name:"BSU", offline:7, online:170, campaign:27, tasks:37, total:241},
+  {name:"MNU", offline:28, online:120, campaign:42, tasks:33, total:223},
+  {name:"ASWU", offline:42, online:105, campaign:36, tasks:30, total:213},
+  {name:"DU", offline:42, online:130, campaign:12, tasks:27, total:211},
+  {name:"BU", offline:0, online:165, campaign:6, tasks:33, total:204},
+  {name:"AZU", offline:28, online:100, campaign:33, tasks:37, total:198},
+  {name:"ECU", offline:63, online:70, campaign:36, tasks:21, total:190},
+  {name:"TU", offline:14, online:120, campaign:21, tasks:35, total:190},
+  {name:"ASU", offline:14, online:95, campaign:27, tasks:40, total:176},
+  {name:"HIAC", offline:7, online:80, campaign:36, tasks:34, total:157},
+  {name:"SCU", offline:28, online:80, campaign:15, tasks:33, total:156},
+  {name:"MUST", offline:0, online:75, campaign:35, tasks:39, total:149},
+  {name:"FU", offline:21, online:95, campaign:12, tasks:19, total:147},
+  {name:"ZU", offline:0, online:91, campaign:15, tasks:31, total:137},
+  {name:"HU", offline:14, online:70, campaign:9, tasks:34, total:127},
+  {name:"MANSU", offline:28, online:50, campaign:18, tasks:30, total:126},
+  {name:"PSU", offline:7, online:60, campaign:12, tasks:40, total:119},
+  {name:"SVU", offline:7, online:80, campaign:9, tasks:18, total:114},
+  {name:"LU", offline:0, online:70, campaign:6, tasks:31, total:107},
+  {name:"AU", offline:7, online:55, campaign:6, tasks:34, total:102},
+  {name:"NMU", offline:0, online:45, campaign:18, tasks:36, total:99},
+  {name:"HWU", offline:21, online:25, campaign:18, tasks:32, total:96},
+  {name:"SZU", offline:0, online:50, campaign:18, tasks:24, total:92},
+  {name:"SU", offline:14, online:40, campaign:15, tasks:23, total:92},
+  {name:"NVU", offline:0, online:45, campaign:6, tasks:34, total:85},
+  {name:"BUC", offline:0, online:40, campaign:9, tasks:25, total:74},
+  {name:"KSIU", offline:21, online:40, campaign:3, tasks:5, total:69},
+  {name:"GU", offline:7, online:40, campaign:3, tasks:24, total:54},
+  {name:"MSA", offline:0, online:30, campaign:6, tasks:10, total:46},
+  {name:"KSU", offline:0, online:15, campaign:6, tasks:16, total:37},
+  {name:"ZC", offline:0, online:5, campaign:3, tasks:8, total:16},
+];
+
+let data = staticData;
+
+async function loadData(selectedMonth){
+  if (!LIVE_DATA_URL){ buildPage(data); return; }
+  try{
+    const url = selectedMonth ? `${LIVE_DATA_URL}?month=${selectedMonth}` : LIVE_DATA_URL;
+    const res = await fetch(url);
+    const json = await res.json();
+
+    if (json.availableMonths && json.availableMonths.length){
+      const wrap = document.getElementById('month-picker-wrap');
+      const picker = document.getElementById('month-picker');
+      wrap.style.display = 'flex';
+      if (!picker.dataset.filled){
+        json.availableMonths.slice().reverse().forEach(m=>{
+          const opt = document.createElement('option');
+          opt.value = m; opt.textContent = m;
+          picker.appendChild(opt);
+        });
+        picker.value = json.month;
+        picker.dataset.filled = '1';
+        picker.addEventListener('change', ()=> loadData(picker.value));
+      } else {
+        picker.value = json.month;
+      }
+    }
+
+    if (Array.isArray(json.data) && json.data.length){
+      data = json.data.map(m => ({
+        name: m.name, offline: Number(m.offline)||0, online: Number(m.course||0)+Number(m.workshop||0)+Number(m.session||0),
+        campaign: Number(m.campaign)||0, tasks: Number(m.task)||0, total: Number(m.total)||0
+      })).sort((a,b)=> b.total - a.total);
+    }
+  }catch(e){ console.warn('تعذر تحميل البيانات الحية، هنعرض آخر نسخة محفوظة', e); }
+  buildPage(data);
+}
+
+function buildPage(list){
+  const podiumEl = document.getElementById('podium');
+  podiumEl.innerHTML = '';
+  const top3 = list.slice(0,3);
+  const medals = ["1st", "2nd", "3rd"];
+  top3.forEach((m,i)=>{
+    const div = document.createElement('div');
+    div.className = `podium-card rank${i+1}`;
+    div.innerHTML = `<div class="medal">${medals[i]}</div>
+      <div class="p-name">${m.name}</div>
+      <div class="p-points">${m.total}</div>
+      <div class="p-label">نقطة</div>`;
+    podiumEl.appendChild(div);
+  });
+
+  const tbody = document.getElementById('board-body');
+  function render(rows){
+    tbody.innerHTML = '';
+    rows.forEach((m)=>{
+      const rank = list.indexOf(m) + 1;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td class="rank-cell">${rank}</td>
+        <td class="model-name">${m.name}</td>
+        <td class="pts-cell">${m.total}</td>`;
+      const detailTr = document.createElement('tr');
+      detailTr.className = 'expand-row';
+      detailTr.innerHTML = `<td colspan="3">
+        <div class="details">
+          <div class="details-inner">
+            <div><b>${m.offline}</b><span>حضوري</span></div>
+            <div><b>${m.online}</b><span>أونلاين</span></div>
+            <div><b>${m.campaign}</b><span>حملات</span></div>
+            <div><b>${m.tasks}</b><span>مهام إضافية</span></div>
+          </div>
+          <div style="text-align:center; padding-bottom:14px;">
+            <button class="why-btn" data-model="${m.name}">ليه أخد النقط دي؟</button>
+          </div>
+        </div>
+      </td>`;
+      tr.addEventListener('click', ()=>{
+        detailTr.querySelector('.details').classList.toggle('open');
+      });
+      tbody.appendChild(tr);
+      tbody.appendChild(detailTr);
+
+      detailTr.querySelector('.why-btn').addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        openPanel(m.name);
+      });
+    });
+  }
+  render(list);
+
+  document.getElementById('search').addEventListener('input', (e)=>{
+    const q = e.target.value.trim().toLowerCase();
+    render(list.filter(m => m.name.toLowerCase().includes(q)));
+  });
+}
+
+// ===== Side panel: "why did this model get these points" =====
+const overlay = document.getElementById('panel-overlay');
+const panel = document.getElementById('side-panel');
+const panelBody = document.getElementById('panel-body');
+const panelName = document.getElementById('panel-model-name');
+const panelSub = document.getElementById('panel-model-sub');
+
+function closePanel(){
+  overlay.classList.remove('open');
+  panel.classList.remove('open');
+}
+document.getElementById('panel-close').addEventListener('click', closePanel);
+overlay.addEventListener('click', closePanel);
+
+// ===== Excel download button =====
+const excelBtn = document.getElementById('excel-btn');
+if (excelBtn){
+  excelBtn.addEventListener('click', async ()=>{
+    if (!LIVE_DATA_URL){
+      alert('لسه الموقع مش متوصل بالبيانات الحية، مفيش ملف إكسل يتنزل دلوقتي.');
+      return;
+    }
+    const picker = document.getElementById('month-picker');
+    const month = picker && picker.value ? picker.value : '';
+    excelBtn.textContent = 'بيجهز...';
+    try{
+      const res = await fetch(`${LIVE_DATA_URL}?type=excel-link&month=${encodeURIComponent(month)}`);
+      const json = await res.json();
+      if (json.url) window.open(json.url, '_blank');
+      else alert('مفيش ملف إكسل جاهز للشهر ده لسه.');
+    }catch(e){
+      alert('حصل خطأ في تجهيز الملف. جرب تاني.');
+    }
+    excelBtn.textContent = 'تنزيل Excel';
+  });
+}
+
+async function openPanel(modelName){
+  panelName.textContent = modelName;
+  const picker = document.getElementById('month-picker');
+  const currentMonth = picker && picker.value ? picker.value : '';
+  panelSub.textContent = currentMonth ? `تفاصيل شهر ${currentMonth}` : 'سبب كل نقطة';
+  overlay.classList.add('open');
+  panel.classList.add('open');
+
+  if (!LIVE_DATA_URL){
+    panelBody.innerHTML = `<div class="panel-empty">التفاصيل المكتوبة (سبب كل نقطة) بتظهر بعد ما توصّل الموقع بالبيانات الحية من Google Sheet.<br><br>البيانات الحالية ثابتة من ملف PDF ومفيش أسباب مسجلة معاها.</div>`;
+    return;
+  }
+
+  panelBody.innerHTML = `<div class="panel-loading">بيحمّل...</div>`;
+  try{
+    const url = `${LIVE_DATA_URL}?type=details&month=${encodeURIComponent(currentMonth)}&model=${encodeURIComponent(modelName)}`;
+    const res = await fetch(url);
+    const items = await res.json();
+
+    if (!Array.isArray(items) || !items.length){
+      panelBody.innerHTML = `<div class="panel-empty">مفيش تفاصيل مسجلة لـ ${modelName} في الشهر ده لحد دلوقتي.</div>`;
+      return;
+    }
+
+    panelBody.innerHTML = items.map(it => `
+      <div class="reason-card">
+        <div class="reason-top">
+          <span class="reason-cat">${it.category || ''}</span>
+          <span class="reason-pts">+${it.points || 0}</span>
+        </div>
+        <div class="reason-text">${(it.reason || 'بدون سبب مسجل')}</div>
+        ${it.postDate ? `<div class="reason-date">${new Date(it.postDate).toLocaleDateString('ar-EG')}</div>` : ''}
+      </div>
+    `).join('');
+  }catch(e){
+    panelBody.innerHTML = `<div class="panel-empty">حصل خطأ في تحميل التفاصيل. جرب تاني.</div>`;
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
